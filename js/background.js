@@ -11,6 +11,18 @@
 //     });
 //   });
 // Called when the user clicks on the browser action.
+
+function getDomainFromURL(url) {
+  u = new URL(url)
+  console.log('Host is:', u.host)
+  host_words = u.host.split(".")
+  console.log('host_words:', host_words)
+  console.log('host_words_reverse:', host_words.reverse())
+
+  domain = "".concat(host_words.reverse()[1], ".", host_words.reverse()[0])
+  return domain
+}
+
 chrome.browserAction.onClicked.addListener(function(tab) {
     // No tabs or host permissions needed!
     console.log('Turning ' + tab.url + ' red!');
@@ -20,8 +32,36 @@ chrome.browserAction.onClicked.addListener(function(tab) {
   });
 
 chrome.tabs.onActivated.addListener(function(tab) {
-    console.log('tabID: ' + tab.tabId);
-    chrome.tabs.get(tab.tabId, function(tabInfo) {
+  activeTabID = tab.tabId
+  console.log('tabID: ' + activeTabID);
+    chrome.tabs.get(activeTabID, function(tabInfo) {
         console.log('tabURL: ' + tabInfo.url);
+        domain = getDomainFromURL(tabInfo.url)
+        console.log('domain:', domain)
+        // seconds = new Date() / 1000
+        seconds = Date.now()
+        console.log('timestamp: ', seconds)
     })
 })
+
+chrome.tabs.onUpdated.addListener(function (activeTabID1, changeInfo, tab) {
+  
+  if (typeof changeInfo.url != "undefined") {
+  // if (changeInfo.url) {
+    console.log('new URL: ' + changeInfo.url);
+    domain = getDomainFromURL(changeInfo.url)
+    console.log('domain:', domain)
+    // seconds = new Date() / 1000
+    seconds = Date.now()
+    console.log('timestamp: ', seconds)
+  }  
+  
+})
+
+// chrome.storage.local.set({key: value}, function() {
+//   console.log('Value is set to ' + value);
+// });
+
+// chrome.storage.local.get(['key'], function(result) {
+//   console.log('Value currently is ' + result.key);
+// });
