@@ -3,8 +3,12 @@
     "description" : "Counting time on sites",
     "version": "1.0",
     "manifest_version": 2,
+    "permissions": ["contextMenus", "activeTab", "tabs", "declarativeContent", "storage", "unlimitedStorage", "http://*/*", "https://*/*"],
+    "background": {
+        "scripts": ["/js/background.js"],
+        "persistent": false
+    },
     "browser_action": {
-      "default_popup": "index.html",
       "default_icon": "time_counter.png"
     }
   }
