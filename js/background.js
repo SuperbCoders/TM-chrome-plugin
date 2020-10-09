@@ -16,10 +16,13 @@ function getDomainFromURL(url) {
   u = new URL(url)
   console.log('Host is:', u.host)
   host_words = u.host.split(".")
+  host_words_reverse = host_words.reverse()
   console.log('host_words:', host_words)
-  console.log('host_words_reverse:', host_words.reverse())
+  console.log('host_words_reverse:', host_words_reverse)
 
-  domain = "".concat(host_words.reverse()[1], ".", host_words.reverse()[0])
+  let domain = "".concat(host_words_reverse[1], ".", host_words_reverse[0])
+  console.log('domain from func body:', domain)
+
   return domain
 }
 
