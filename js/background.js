@@ -12,14 +12,64 @@
 //   });
 // Called when the user clicks on the browser action.
 
+var domain_last = ""
 
-function setTimeSite(url, time) {
+function setTimeSiteOpen(url, time) {
 
-
-
-  chrome.storage.local.set({key: value}, function() {
-    console.log('Value is set to ' + value);
+  chrome.storage.local.set({[url + '_open']: time}, function() {
+    console.log('domain_open is set to ' + time);
   });
+
+  // chrome.storage.local.get(url, function(result) {
+  //   console.log('domain_open is ', result[url]);
+  // });
+}
+
+function setTimeSiteClose(domain_last, seconds) {
+  
+  var time_domain_last_open,
+      last_time_site_duration
+
+  let time_domain_last_close = seconds
+
+  chrome.storage.local.set({[domain_last + '_close']: seconds}, function() {
+    // time_domain_last_close = seconds
+    console.log('domain_last_close is set to ' + time_domain_last_close);
+  });
+
+  chrome.storage.local.get(domain_last + '_open', function(result) {
+    time_domain_last_open = result[domain_last + '_open']
+    console.log('domain_last_open is ', time_domain_last_open);
+  });
+
+  last_time_site_duration = Number(time_domain_last_close) - Number(time_domain_last_open)
+  console.log('last_time_site_duration is ', String(last_time_site_duration));
+
+  setTimeSiteDuration(domain_last, last_time_site_duration)
+
+}
+
+function setTimeSiteDuration(domain, last_time_site_duration) {
+  
+  var domain_duration,
+      domain_duration_new
+  
+  chrome.storage.local.get(domain + '_duration', function(result) {
+    domain_duration = result[domain + '_duration']
+    console.log('domain_duration is ', domain_duration);
+  });
+
+  if (typeof domain_duration == "undefined") {
+    domain_duration = 0
+  }
+
+  domain_duration_new = Number(domain_duration) + Number(last_time_site_duration)
+
+  chrome.storage.local.set({[domain + '_duration']: domain_duration_new}, function() {
+    console.log('domain_duration new is ' + domain_duration_new);
+  });
+
+
 }
 
 function getDomainFromURL(url) {
@@ -47,18 +97,24 @@ chrome.browserAction.onClicked.addListener(function(tab) {
   });
 
 chrome.tabs.onActivated.addListener(function(tab) {
+
+  let seconds_activated = Date.now()
+
+  setTimeSiteClose(domain_last, seconds_activated)
+
   activeTabID = tab.tabId
   console.log('tabID: ' + activeTabID);
-    chrome.tabs.get(activeTabID, function(tabInfo) {
-        console.log('tabURL: ' + tabInfo.url);
-        domain = getDomainFromURL(tabInfo.url)
-        console.log('domain:', domain)
-        // seconds = new Date() / 1000
-        seconds = Date.now()
-        console.log('timestamp: ', seconds)
+  chrome.tabs.get(activeTabID, function(tabInfo) {
+      console.log('tabURL: ' + tabInfo.url);
+      let domain_activated = getDomainFromURL(tabInfo.url)
+      domain_last = domain_activated
+      console.log('domain:', domain_activated)
+      // seconds = new Date() / 1000
+      
+      console.log('timestamp: ', seconds_activated)
 
-        // setTimeSite(tabInfo.url, )
-    })
+      setTimeSiteOpen(domain_activated, seconds_activated)
+  })
 })
 
 chrome.tabs.onUpdated.addListener(function (activeTabID1, changeInfo, tab) {
@@ -66,8 +122,8 @@ chrome.tabs.onUpdated.addListener(function (activeTabID1, changeInfo, tab) {
   if (typeof changeInfo.url != "undefined") {
   // if (changeInfo.url) {
     console.log('new URL: ' + changeInfo.url);
-    domain = getDomainFromURL(changeInfo.url)
-    console.log('domain:', domain)
+    let domain_updated = getDomainFromURL(changeInfo.url)
+    console.log('domain:', domain_updated)
     // seconds = new Date() / 1000
     seconds = Date.now()
     console.log('timestamp: ', seconds)
