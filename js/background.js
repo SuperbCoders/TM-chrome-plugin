@@ -108,3 +108,8 @@ chrome.tabs.onUpdated.addListener(function (activeTabID1, changeInfo, tab) {
     setTimeSiteOpen(domain_updated, seconds_updated)
   }  
 })
+
+
+chrome.windows.onFocusChanged.addListener(function (windowId) {
+  console.log("!!! FOCUS CHANGED !!!,  windowId: " , windowId)
+})
