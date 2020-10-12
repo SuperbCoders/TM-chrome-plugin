@@ -11,7 +11,7 @@ var domain_last_updated = ""
 function setTimeSiteOpen(url, time) {
 
   chrome.storage.local.set({[url + '_open']: time}, function() {
-    console.log('domain_open is set to ' + time);
+    // console.log('domain_open is set to ' + time);
   });
 }
 
@@ -21,15 +21,15 @@ function setTimeSiteClose(domain_last, seconds) {
   let time_domain_last_close = seconds
 
   chrome.storage.local.set({[domain_last + '_close']: seconds}, function() {
-    console.log('domain_last_close is set to ' + time_domain_last_close);
+    // console.log('domain_last_close is set to ' + time_domain_last_close);
   });
 
   chrome.storage.local.get(domain_last + '_open', function(result) {
     time_domain_last_open = result[domain_last + '_open']
-    console.log('domain_last_open is ', time_domain_last_open);
+    // console.log('domain_last_open is ', time_domain_last_open);
 
     last_time_site_duration = Number(time_domain_last_close) - Number(time_domain_last_open)
-    console.log('last_time_site_duration is ', String(last_time_site_duration));
+    // console.log('last_time_site_duration is ', String(last_time_site_duration));
   
     setTimeSiteDuration(domain_last, last_time_site_duration)
 
@@ -40,7 +40,7 @@ function setTimeSiteDuration(domain, last_time_site_duration) {
   
   chrome.storage.local.get(domain + '_duration', function(result) {
     domain_duration = result[domain + '_duration']
-    console.log('domain_duration is ', domain_duration);
+    // console.log('domain_duration is ', domain_duration);
     
     if (typeof domain_duration == "undefined") {
       domain_duration = 0
@@ -49,7 +49,7 @@ function setTimeSiteDuration(domain, last_time_site_duration) {
     domain_duration_new = Number(domain_duration) + Number(last_time_site_duration)
 
     chrome.storage.local.set({[domain + '_duration']: domain_duration_new}, function() {
-      console.log('domain_duration new is ' + domain_duration_new);
+      // console.log('domain_duration new is ' + domain_duration_new);
     });
 
   });
@@ -57,16 +57,16 @@ function setTimeSiteDuration(domain, last_time_site_duration) {
 
 function getDomainFromURL(url) {
   u = new URL(url)
-  console.log('Host is:', u.host)
+  // console.log('Host is:', u.host)
 
   host_words = u.host.split(".")
-  console.log('host_words:', host_words)
+  // console.log('host_words:', host_words)
 
   host_words_reverse = host_words.reverse()
-  console.log('host_words_reverse:', host_words_reverse)
+  // console.log('host_words_reverse:', host_words_reverse)
 
   let domain = "".concat(host_words_reverse[1], ".", host_words_reverse[0])
-  console.log('domain from func body:', domain)
+  // console.log('domain from func body:', domain)
 
   return domain
 }
@@ -84,8 +84,8 @@ chrome.tabs.onActivated.addListener(function(tab) {
       let domain_activated = getDomainFromURL(tabInfo.url)
       domain_last = domain_activated
 
-      console.log('domain:', domain_activated)
-      console.log('timestamp: ', seconds_activated)
+      // console.log('domain:', domain_activated)
+      // console.log('timestamp: ', seconds_activated)
 
       setTimeSiteOpen(domain_activated, seconds_activated)
   })
@@ -98,12 +98,12 @@ chrome.tabs.onUpdated.addListener(function (activeTabID1, changeInfo, tab) {
     
     setTimeSiteClose(domain_last_updated, seconds_updated)
 
-    console.log('new URL: ' + changeInfo.url);
+    // console.log('new URL: ' + changeInfo.url);
     let domain_updated = getDomainFromURL(changeInfo.url)
     domain_last_updated = domain_updated
 
-    console.log('domain:', domain_updated)
-    console.log('timestamp: ', seconds_updated)
+    // console.log('domain:', domain_updated)
+    // console.log('timestamp: ', seconds_updated)
 
     setTimeSiteOpen(domain_updated, seconds_updated)
   }  
@@ -111,5 +111,5 @@ chrome.tabs.onUpdated.addListener(function (activeTabID1, changeInfo, tab) {
 
 
 chrome.windows.onFocusChanged.addListener(function (windowId) {
-  console.log("!!! FOCUS CHANGED !!!,  windowId: " , windowId)
+  // console.log("!!! FOCUS CHANGED !!!,  windowId: " , windowId)
 })
