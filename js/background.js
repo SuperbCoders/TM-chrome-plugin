@@ -5,6 +5,12 @@
 //   });
 // Called when the user clicks on the browser action.
 
+chrome.alarms.create('refresh', { periodInMinutes: 3 });
+
+chrome.alarms.onAlarm.addListener((alarm) => {
+  alert("Hello, world!");
+});
+
 var domain_last = ""
 var domain_last_updated = ""
 
