@@ -8,6 +8,10 @@
 chrome.alarms.create('refresh', { periodInMinutes: 1 });
 
 chrome.alarms.onAlarm.addListener((alarm) => {
+  let seconds_sendJSON = Date.now()
+  setTimeSiteClose(activeTabURL, seconds_sendJSON)
+  setTimeSiteOpen(activeTabURL, seconds_sendJSON)
+
   chrome.storage.local.get(null, function(items) {
     
     let dateFormat = getDateFormatDDMMYYY()
@@ -26,7 +30,6 @@ chrome.alarms.onAlarm.addListener((alarm) => {
     domains_object_JSON = JSON.stringify(domains_object)
     console.log(domains_object_JSON);
   });
-
 });
 
 var domain_last = ""
@@ -34,8 +37,7 @@ var domain_last_updated = ""
 
 function getDateFormatDDMMYYY() {
   let date = new Date()
-  let dateFormat = ''
-  dateFormat = dateFormat.concat(date.getUTCDate(), date.getUTCMonth() + 1, date.getUTCFullYear())
+  let dateFormat = ''.concat(date.getUTCDate(), date.getUTCMonth() + 1, date.getUTCFullYear())
 
   return dateFormat
 }
@@ -70,13 +72,9 @@ function setTimeSiteClose(domain_last, seconds) {
 
   chrome.storage.local.get(domain_last + '_open', function(result) {
     time_domain_last_open = result[domain_last + '_open']
-    // console.log('domain_last_open is ', time_domain_last_open);
-
     last_time_site_duration = Number(time_domain_last_close) - Number(time_domain_last_open)
-    // console.log('last_time_site_duration is ', String(last_time_site_duration));
   
     setTimeSiteDuration(domain_last, last_time_site_duration)
-
   });
 }
 
@@ -103,16 +101,10 @@ function setTimeSiteDuration(domain, last_time_site_duration) {
 
 function getDomainFromURL(url) {
   u = new URL(url)
-  // console.log('Host is:', u.host)
 
   host_words = u.host.split(".")
-  // console.log('host_words:', host_words)
-
   host_words_reverse = host_words.reverse()
-  // console.log('host_words_reverse:', host_words_reverse)
-
   let domain = "".concat(host_words_reverse[1], ".", host_words_reverse[0])
-  // console.log('domain from func body:', domain)
 
   return domain
 }
@@ -124,15 +116,11 @@ chrome.tabs.onActivated.addListener(function(tab) {
   setTimeSiteClose(domain_last, seconds_activated)
 
   activeTabID = tab.tabId
-  // console.log('tabID: ' + activeTabID);
+
   chrome.tabs.get(activeTabID, function(tabInfo) {
-      // console.log('tabURL: ' + tabInfo.url);
       let domain_activated = getDomainFromURL(tabInfo.url)
       activeTabURL = domain_activated
       domain_last = domain_activated
-
-      // console.log('domain:', domain_activated)
-      // console.log('timestamp: ', seconds_activated)
 
       setTimeSiteOpen(domain_activated, seconds_activated)
   })
@@ -145,23 +133,19 @@ chrome.tabs.onUpdated.addListener(function (activeTabID1, changeInfo, tab) {
     
     setTimeSiteClose(domain_last_updated, seconds_updated)
 
-    // console.log('new URL: ' + changeInfo.url);
     let domain_updated = getDomainFromURL(changeInfo.url)
     domain_last_updated = domain_updated
     activeTabURL = domain_updated
-
-    // console.log('domain:', domain_updated)
-    // console.log('timestamp: ', seconds_updated)
 
     setTimeSiteOpen(domain_updated, seconds_updated)
   }  
 })
 
 chrome.tabs.onRemoved.addListener(function (removedTabID, removeInfo) {
-  console.log("removeInfo: ", removeInfo)
-  console.log("activeTabID: ", activeTabID)
-  console.log("removedTabID: ", removedTabID)
-  console.log("activeTabURL: ", activeTabURL)
+  // console.log("removeInfo: ", removeInfo)
+  // console.log("activeTabID: ", activeTabID)
+  // console.log("removedTabID: ", removedTabID)
+  // console.log("activeTabURL: ", activeTabURL)
 
   let seconds_removed = Date.now()
   setTimeSiteClose(activeTabURL, seconds_removed)
