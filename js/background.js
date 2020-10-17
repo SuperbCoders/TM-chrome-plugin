@@ -8,16 +8,17 @@
 chrome.alarms.create('refresh', { periodInMinutes: 1 });
 
 chrome.alarms.onAlarm.addListener((alarm) => {
-  // console.log("Alarm is here, alarm.name: ", alarm.name);
-
   chrome.storage.local.get(null, function(items) {
+    
+    let dateFormat = getDateFormatDDMMYYY()
+    
     domains_object = {
-      date: getDateFormatDDMMYYY()
+      date: dateFormat
     }
 
     for (var key in items) {
       var parts = key.split("_")
-      if (parts[1] == "duration") {
+      if (parts[1] == "duration" && parts[2] == dateFormat) {
         domains_object[parts[0]] = msToTime(items[key])
       }
     }
@@ -127,6 +128,7 @@ chrome.tabs.onActivated.addListener(function(tab) {
   chrome.tabs.get(activeTabID, function(tabInfo) {
       // console.log('tabURL: ' + tabInfo.url);
       let domain_activated = getDomainFromURL(tabInfo.url)
+      activeTabURL = domain_activated
       domain_last = domain_activated
 
       // console.log('domain:', domain_activated)
@@ -146,12 +148,23 @@ chrome.tabs.onUpdated.addListener(function (activeTabID1, changeInfo, tab) {
     // console.log('new URL: ' + changeInfo.url);
     let domain_updated = getDomainFromURL(changeInfo.url)
     domain_last_updated = domain_updated
+    activeTabURL = domain_updated
 
     // console.log('domain:', domain_updated)
     // console.log('timestamp: ', seconds_updated)
 
     setTimeSiteOpen(domain_updated, seconds_updated)
   }  
+})
+
+chrome.tabs.onRemoved.addListener(function (removedTabID, removeInfo) {
+  console.log("removeInfo: ", removeInfo)
+  console.log("activeTabID: ", activeTabID)
+  console.log("removedTabID: ", removedTabID)
+  console.log("activeTabURL: ", activeTabURL)
+
+  let seconds_removed = Date.now()
+  setTimeSiteClose(activeTabURL, seconds_removed)
 })
 
 
