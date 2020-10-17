@@ -9,10 +9,37 @@ chrome.alarms.create('refresh', { periodInMinutes: 1 });
 
 chrome.alarms.onAlarm.addListener((alarm) => {
   console.log("Alarm is here, alarm.name: ", alarm.name);
+
+  chrome.storage.local.get(null, function(items) {
+    domains_object = {}
+
+    for (var key in items) {
+      var parts = key.split("_")
+      if (parts[1] == "duration") {
+        domains_object[parts[0]] = msToTime(items[key])
+      }
+    }
+
+    domains_object_JSON = JSON.stringify(domains_object)
+    console.log(domains_object_JSON);
+  });
+
 });
 
 var domain_last = ""
 var domain_last_updated = ""
+
+function msToTime(duration) {
+  var seconds = Math.floor((duration / 1000) % 60),
+    minutes = Math.floor((duration / (1000 * 60)) % 60),
+    hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
+
+  hours = (hours < 10) ? "0" + hours : hours;
+  minutes = (minutes < 10) ? "0" + minutes : minutes;
+  seconds = (seconds < 10) ? "0" + seconds : seconds;
+
+  return hours + ":" + minutes + ":" + seconds;
+}
 
 function setTimeSiteOpen(url, time) {
 
