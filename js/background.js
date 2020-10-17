@@ -8,10 +8,12 @@
 chrome.alarms.create('refresh', { periodInMinutes: 1 });
 
 chrome.alarms.onAlarm.addListener((alarm) => {
-  console.log("Alarm is here, alarm.name: ", alarm.name);
+  // console.log("Alarm is here, alarm.name: ", alarm.name);
 
   chrome.storage.local.get(null, function(items) {
-    domains_object = {}
+    domains_object = {
+      date: getDateFormatDDMMYYY()
+    }
 
     for (var key in items) {
       var parts = key.split("_")
@@ -28,6 +30,14 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 
 var domain_last = ""
 var domain_last_updated = ""
+
+function getDateFormatDDMMYYY() {
+  let date = new Date()
+  let dateFormat = ''
+  dateFormat = dateFormat.concat(date.getUTCDate(), date.getUTCMonth() + 1, date.getUTCFullYear())
+
+  return dateFormat
+}
 
 function msToTime(duration) {
   var seconds = Math.floor((duration / 1000) % 60),
@@ -71,9 +81,11 @@ function setTimeSiteClose(domain_last, seconds) {
 
 function setTimeSiteDuration(domain, last_time_site_duration) {
   
-  chrome.storage.local.get(domain + '_duration', function(result) {
-    domain_duration = result[domain + '_duration']
-    // console.log('domain_duration is ', domain_duration);
+  let dateFormatDDMMYYY = getDateFormatDDMMYYY()
+  let domain_duration_key = domain + '_duration' + '_' + dateFormatDDMMYYY
+
+  chrome.storage.local.get(domain_duration_key, function(result) {
+    domain_duration = result[domain_duration_key]
     
     if (typeof domain_duration == "undefined") {
       domain_duration = 0
@@ -81,7 +93,7 @@ function setTimeSiteDuration(domain, last_time_site_duration) {
 
     domain_duration_new = Number(domain_duration) + Number(last_time_site_duration)
 
-    chrome.storage.local.set({[domain + '_duration']: domain_duration_new}, function() {
+    chrome.storage.local.set({[domain_duration_key]: domain_duration_new}, function() {
       // console.log('domain_duration new is ' + domain_duration_new);
     });
 
