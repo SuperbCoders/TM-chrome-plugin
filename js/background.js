@@ -1,10 +1,3 @@
-// chrome.runtime.onInstalled.addListener(function() {
-//     chrome.storage.sync.set({color: '#3aa757'}, function() {
-//       console.log("The color is green.");
-//     });
-//   });
-// Called when the user clicks on the browser action.
-
 chrome.alarms.create('refresh', { periodInMinutes: 1 });
 
 chrome.alarms.onAlarm.addListener((alarm) => {
@@ -57,7 +50,7 @@ function msToTime(duration) {
 function setTimeSiteOpen(url, time) {
 
   chrome.storage.local.set({[url + '_open']: time}, function() {
-    // console.log('domain_open is set to ' + time);
+    // ...
   });
 }
 
@@ -67,7 +60,7 @@ function setTimeSiteClose(domain_last, seconds) {
   let time_domain_last_close = seconds
 
   chrome.storage.local.set({[domain_last + '_close']: seconds}, function() {
-    // console.log('domain_last_close is set to ' + time_domain_last_close);
+    // ...
   });
 
   chrome.storage.local.get(domain_last + '_open', function(result) {
@@ -93,7 +86,7 @@ function setTimeSiteDuration(domain, last_time_site_duration) {
     domain_duration_new = Number(domain_duration) + Number(last_time_site_duration)
 
     chrome.storage.local.set({[domain_duration_key]: domain_duration_new}, function() {
-      // console.log('domain_duration new is ' + domain_duration_new);
+      // ...
     });
 
   });
@@ -142,16 +135,11 @@ chrome.tabs.onUpdated.addListener(function (activeTabID1, changeInfo, tab) {
 })
 
 chrome.tabs.onRemoved.addListener(function (removedTabID, removeInfo) {
-  // console.log("removeInfo: ", removeInfo)
-  // console.log("activeTabID: ", activeTabID)
-  // console.log("removedTabID: ", removedTabID)
-  // console.log("activeTabURL: ", activeTabURL)
-
   let seconds_removed = Date.now()
   setTimeSiteClose(activeTabURL, seconds_removed)
 })
 
 
 chrome.windows.onFocusChanged.addListener(function (windowId) {
-  // console.log("!!! FOCUS CHANGED !!!,  windowId: " , windowId)
+  // ...
 })
